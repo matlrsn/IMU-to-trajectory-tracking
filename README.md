@@ -10,9 +10,9 @@ The code is structured around five main classes plus one utility function.
 ## Quickstart
 
 1. Place your IMU data in an Excel file (`.xlsx`) with columns for accelerometer, gyroscope, and optionally magnetometer + timestamp.  
-2. Edit the bottom of **IMU2Track_v3.py** to point to your file:  
+2. Edit config class of **IMU2Track_v3.py** to point to your file:  
    ```python
-   results = process_imu_data("your_file.xlsx", config)
+   data_file: str = 'data/your_file_name.xlsx'
 3. First time running: run this command to install necessary libraries:
 ```bash
 pip install -r requirements.txt
