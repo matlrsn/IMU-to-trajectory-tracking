@@ -1,3 +1,5 @@
+# Author : Mathis Larsen
+# Date : 27/08/2025
 # %% ====== CONTEXT AND SOURCES ======
 # ====================================
 # This script implements a sensor fusion algorithm (based on Madgwick's AHRS)
