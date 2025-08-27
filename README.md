@@ -35,12 +35,12 @@ This will install all libraries from the `requirements.txt` file.
 - timestamp(s) (optional)
 
 ### 2. Place your file
-- Put your `.xlsx` file in the same folder as the script (or provide full path).
+- Put your `.xlsx` file in a data folder (or provide full path).
 
 ### 3. Edit the script
-At the bottom of **IMU2Track_v3.py**, replace:
+In the IMUconfig class of **IMU2Track_v3.py**, replace:
 ```python
-results = process_imu_data('your_file.xlsx', config)
+data_file: str = 'data/your_file_name.xlsx'
 ```
 with your file name.
 
@@ -182,11 +182,11 @@ pip install --upgrade -r requirements.txt
 
 ## TODO and notes
 
-- Bias estimation (accelerometer and gyroscope) is done twice, once directly onboard the GSAT and a second time in this script. This should not bring major issues but still has to be addressed. Either remove bias calibration in the GSAT or in this script.
-- Bias estimation and gravity alignment needs a completely stationnary GSAT to get the best results. In the next tests, place the GSAT on the ground for 30 seconds before going.
+- Bias estimation and gravity alignment needs a completely stationnary IMU to get the best results.
 - There is a lot of drift on the Z-axis, this is inevitable with most IMUs as drift in Z grows quadratically with time, even with good calibration.
-- Still not totally confident about the magnetometer alignment with North, to be checked again.
-- Might be a problem in initial calibration with how samples are counted. I think that the bias_estimation_window number does not match the number of samples used for actual calibration.
-- The Madgwick filter actually performs best using IMU-only data, which may be surprising since one might expect a full MARG setup to be superior. Tests show that the IMU-only approach provides higher precision under low-dynamic conditions, though this may not hold true during high-dynamic movements. MARG is also necessary to align Z-axis with North.
+- Still not totally confident about the magnetometer alignment with North, to be checked.
+- Might be a problem in initial calibration with how samples are counted. I think that the `bias_estimation_window` number does not match the number of samples used for actual calibration.
+- The Madgwick filter actually performs best using IMU-only data, which may be surprising since one might expect a full MARG setup to be superior. Tests show that the IMU-only approach provides higher precision under low-dynamic conditions, though this may not hold true during high-dynamic movements. Note that MARG is also necessary to align Z-axis with North.
 - Examining the reconstructed trajectory, the filter appears to struggle with accurately determining the direction of motion. This may be due to residual drift from the gyroscope integration. A solution is to reduce the $\beta$ value, giving more trust to raw measurements.
 - X-axis is assumed to be pointing North when initialized. An "auto" mode will have to be implemented, to align IMU axes regardless of any axis pointing to North. This requires good calibration of magnetometer data to provide a good North angle estimation.
+- ZUPT and GPS recalibration is not implemented. With those algorithm, trajectory tracking will be very precise.
