@@ -31,8 +31,7 @@ from collections import deque
 class IMUConfig:
     """Configuration parameters for IMU processing"""
 
-    # file name of data to be processed, replace with your actual file name
-    data_file: str = 'data/100hz_final_test_001.xlsx'
+    data_file = 'data/100hz_final_test_001.xlsx'  # file name of data to be processed, replace wb,jx'
 
     # Sampling parameters
     sample_rate: float = 100.0             # Sample rate (IMU frames rate) [Hz]
@@ -447,18 +446,26 @@ class IMUTracker:
             # Check for outliers
             is_outlier = self.motion_constraints.detect_outliers(acc_world_no_gravity)
 
+            # Store previous states needed for Trapezoidal integration
+            prev_acc = self.acceleration.copy()
+            prev_vel = self.velocity.copy()
+
+            # Check for outliers and update current acceleration
             if not is_outlier:
                 self.acceleration = acc_world_no_gravity
-            # else keep previous acceleration
+            # else: keep self.acceleration as previous value (or set to zero if preferred)
 
-            # Integrate acceleration to velocity using trapezoidal rule (semi-implicit Euler)
-            self.velocity += self.acceleration * dt
+            # 1. Integrate acceleration to velocity (Trapezoidal Rule)
+            # v_new = v_old + 0.5 * (a_old + a_new) * dt
+            self.velocity = prev_vel + 0.5 * (prev_acc + self.acceleration) * dt
 
             # Apply velocity constraints
             self.velocity = self.motion_constraints.constrain_velocity(self.velocity)
 
-            # Integrate velocity to position
-            self.position += self.velocity * dt
+            # 2. Integrate velocity to position (Trapezoidal Rule)
+            # p_new = p_old + 0.5 * (v_old + v_new) * dt
+            self.position += 0.5 * (prev_vel + self.velocity) * dt
+
         else:
             # Before Madgwick starts, keep initial orientation
             self.orientation = self.madgwick.q.copy()
